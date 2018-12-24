@@ -1,0 +1,15 @@
+from .enums import RAVERESPONSE
+
+class Response:
+    def __init__(self, status, message, data):
+        self.status = status
+        self.message = message
+        self. data = data
+
+    @classmethod
+    def from_dict(cls, response_dict):
+        return cls(
+            RAVERESPONSE.from_string(response_dict['status']),
+            response_dict['message'],
+            response_dict['data']
+        )
