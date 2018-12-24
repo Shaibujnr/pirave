@@ -2,8 +2,7 @@ import pytest
 
 from pirave.api import Api, configure, default_api
 from pirave.enums import Environment
-from pirave.exceptions import (InvalidEnvironmentException,
-                               MissingConfigException)
+from pirave.exceptions import MissingConfigException
 
 
 def test_get_api_without_previous_config():

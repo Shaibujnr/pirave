@@ -1,4 +1,4 @@
-from .enums import RAVERESPONSE
+from .enums import RESPONSE_STATUS
 
 class Response:
     def __init__(self, status, message, data):
@@ -9,7 +9,7 @@ class Response:
     @classmethod
     def from_dict(cls, response_dict):
         return cls(
-            RAVERESPONSE.from_string(response_dict['status']),
+            RESPONSE_STATUS(response_dict['status']),
             response_dict['message'],
             response_dict['data']
         )

@@ -7,7 +7,7 @@ from pirave.exceptions import (
 from pirave.util import validate_params, encrypt_data
 from pirave.api import reset_api, default_api, configure
 from pirave.enums import Environment
-from pirave.parameters import CARD_CHARGE_PARAMETERS
+from pirave.parameters import CARD_CHARGE_PARAMETER_GUIDE
 import json
 
 
@@ -25,7 +25,7 @@ def test_validate_params_with_missing_params():
                 "first_name": "Jane",
                 "last_name":"Doe",
             }, 
-            CARD_CHARGE_PARAMETERS)
+            CARD_CHARGE_PARAMETER_GUIDE)
 
 
 def test_validate_params_with_invalid_params():
@@ -44,7 +44,7 @@ def test_validate_params_with_invalid_params():
                 "txref": 712480329,
                 "invalid": "argument"
             }, 
-            CARD_CHARGE_PARAMETERS)
+            CARD_CHARGE_PARAMETER_GUIDE)
 
 
 def test_validate_params():
@@ -62,7 +62,7 @@ def test_validate_params():
             "txref": 712480329,
         
         }, 
-        CARD_CHARGE_PARAMETERS)
+        CARD_CHARGE_PARAMETER_GUIDE)
 
     assert bool(data) is True
 
@@ -80,7 +80,7 @@ def test_encryption(api):
             "last_name":"Doe",
             "txref": 712480329,
         
-        }, CARD_CHARGE_PARAMETERS)
+        }, CARD_CHARGE_PARAMETER_GUIDE)
     data["PBFPubKey"] = api.public_key
     plain_text = str(data)
     encrypted = encrypt_data(plain_text, api.private_key)

@@ -9,6 +9,7 @@ def validate_params(params, guides):
     data = {}
     try:
         for guide in guides:
+
             data[guide[0]] = params[guide[1]] if guide[2] else params.get(guide[1], guide[3])
             if guide[1] in params:
                 del params[guide[1]]
@@ -18,6 +19,10 @@ def validate_params(params, guides):
     if params:
         raise InvalidArgumentException()
     return {k:v for k,v in data.items() if bool(v)}
+
+
+def get_time_ms():
+    return str(int(round(time.time() * 1000)))
 
 
 # Rave encryption

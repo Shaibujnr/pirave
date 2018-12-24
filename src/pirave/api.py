@@ -62,7 +62,7 @@ def default_api():
     Raises:
         MissingConfigException: If configuring via environment variables and
             either RAVE_PUBLIC or RAVE_PRIVATE_KEY is missing.
-        InvalidEnvironmentException: If configuring via environment variables
+        ValueError: If configuring via environment variables
             and a value other than 'sandbox' or 'live' is stored as
             RAVE_ENVIRONMENT
 
@@ -75,7 +75,7 @@ def default_api():
         except KeyError:
             raise MissingConfigException("Required RAVE_PUBLIC_KEY and RAVE_PRIVATE_KEY")
 
-        environment = Environment.from_string(os.environ.get("RAVE_ENVIRONMENT", "sandbox"))
+        environment = Environment(os.environ.get("RAVE_ENVIRONMENT", "sandbox"))
         __api__ = Api(public_key, private_key, environment)
     return __api__
 
