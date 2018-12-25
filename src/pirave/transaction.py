@@ -121,10 +121,25 @@ class Transaction:
 
     @classmethod
     def charge(cls, charge_type):
+
+        __charge_type_guide_mapping = {
+            CHARGE.CARD: CARD_CHARGE_PARAMETER_GUIDE,
+            CHARGE.CARD.value: CARD_CHARGE_PARAMETER_GUIDE,
+            CHARGE.BANK: BANK_CHARGE_PARAMETER_GUIDE,
+            CHARGE.BANK.value: BANK_CHARGE_PARAMETER_GUIDE
+        }
+
+        try:
+            guide = __charge_type_guide_mapping[charge_type]
+        except KeyError:
+            raise InvalidChargeTypeError("Charge type is not supported")
+
         def __initiate(data=None, api=None, **kwargs):
             api = api or default_api()
             data = validate_params(data or kwargs, guide)
             data["PBFPubKey"] = api.public_key
+            if charge_type == CHARGE.BANK:
+                data["payment_type"] = "account"
             root = api.root_url
             url = root+"/flwv3-pug/getpaidx/api/charge"
             headers = {
@@ -139,32 +154,17 @@ class Transaction:
             }
             response = requests.post(url, data=json.dumps(post_data), headers=headers)
             response = Response.from_dict(response.json())
+            print("\n\n\n")
+            print("From initiate transaction charge")
+            print(response.status)
+            print(response.message)
+            print(response.data)
+            print("\n\n\n")
             if response.status == RESPONSE_STATUS.SUCCESS:
-                if cls.__is_auth(data):
+                if cls.__is_auth(data, charge_type):
                     return cls.__from_dict(response.data)
                 else:
                     return SUGGESTED_AUTH(response.data.get("suggested_auth"))
-            else:
-                print("\n\n\n")
-                print("From initiate transaction charge")
-                print(response.status)
-                print(response.message)
-                print(response.data)
-                print("\n\n\n")
-
-
-        __charge_type_guide_mapping = {
-            CHARGE.CARD: CARD_CHARGE_PARAMETER_GUIDE,
-            CHARGE.CARD.value: CARD_CHARGE_PARAMETER_GUIDE,
-            CHARGE.BANK: BANK_CHARGE_PARAMETER_GUIDE,
-            CHARGE.BANK.value: BANK_CHARGE_PARAMETER_GUIDE
-        }
-        try:
-            guide = __charge_type_guide_mapping[charge_type]
-        except KeyError:
-            raise InvalidChargeTypeError("Charge type is not supported")
-        
-
         return type("__Charge", (), {'initiate':__initiate})
 
 
@@ -195,20 +195,21 @@ class Transaction:
 
     
     @staticmethod
-    def __is_auth(data):
-        if not "suggested_auth" in data:
-            return False
-        sauth = SUGGESTED_AUTH(data["suggested_auth"])
-        try:
-            if sauth == SUGGESTED_AUTH.PIN:
-                assert "pin" in data
-            elif sauth == SUGGESTED_AUTH.NOAUTH_INTERNATIONAL or sauth == SUGGESTED_AUTH.AVS_VBVSECURECODE:
-                assert "billing_zip" in data
-                assert "billing_city" in data
-                assert "billing_address" in data
-                assert "billing_state" in data
-                assert "billing_country" in data
-        except AssertionError:
-            return False
+    def __is_auth(data, charge_type):
+        if charge_type == CHARGE.CARD:
+            if not "suggested_auth" in data:
+                return False
+            sauth = SUGGESTED_AUTH(data["suggested_auth"])
+            try:
+                if sauth == SUGGESTED_AUTH.PIN:
+                    assert "pin" in data
+                elif sauth == SUGGESTED_AUTH.NOAUTH_INTERNATIONAL or sauth == SUGGESTED_AUTH.AVS_VBVSECURECODE:
+                    assert "billing_zip" in data
+                    assert "billing_city" in data
+                    assert "billing_address" in data
+                    assert "billing_state" in data
+                    assert "billing_country" in data
+            except AssertionError:
+                return False
 
         return True 

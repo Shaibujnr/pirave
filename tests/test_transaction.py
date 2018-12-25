@@ -65,6 +65,7 @@ def test_transaction_charge_has_initiate():
     assert hasattr(charge, 'initiate')
     assert callable(charge.initiate)
 
+
 def test_initiate_transaction_card_charge(api):
     data = {
         "cardno": "5438898014560229",
@@ -95,3 +96,25 @@ def test_validate_transaction_card_charge(api):
     response = transaction.validate("12345")
     assert isinstance(response, Response)
 
+
+def test_initiate_transaction_bank_charge(api):
+    data = {
+        "account_number": "0690000031",
+        "bank": "044",
+        "amount": 7500,
+        "email": "tbank@gmail.com",
+        "phone_number": "08012345678",
+        "first_name": "Transaction",
+        "last_name": "Bank",
+        "txref": "tbankref",
+        "bvn": "nobvn",
+        "pass_code": "nopasscode",
+    }
+    response = Transaction.charge(CHARGE.BANK).initiate(**data)
+    assert isinstance(response, Transaction)
+    assert response.txref == "tbankref"
+    assert response.payment_type == "account"
+    assert response.flwref is not None
+    assert response.charge_code == "02"
+    assert response.status == TRANSACTION_STATUS.PENDING
+    assert response.raw_data is not None

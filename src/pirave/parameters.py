@@ -27,7 +27,25 @@ CARD_CHARGE_PARAMETER_GUIDE = [
     ("billingcountry", "billing_country", False, None),
 ]
 
-BANK_CHARGE_PARAMETER_GUIDE = []
+BANK_CHARGE_PARAMETER_GUIDE = [
+    ("accountnumber", "account_number", True, None),
+    ("accountbank", "bank", True, None),
+    ("currency", "currency", False, "NGN"),
+    ("country", "country", False, "NG"),
+    ("amount", "amount", True, None),
+    ("email", "email", True, None),
+    ("phonenumber", "phone_number", True, None),
+    ("firstname", "first_name", True, None),
+    ("lastname", "last_name", True, None),
+    ("IP", "ip", False, None),
+    ("txRef", "txref", True, None),
+    ("bvn", "bvn", True, None), #Required for UBA bank accounts
+    ("passcode", "pass_code", True, None), #Required for Zenith bank accounts
+    ("device_fingerprint", "device_fingerprint", False, None),
+    ("redirect_url", "redirect_url", False, None),
+    ("subaccounts", "sub_accounts", False, None),
+    ("meta", "metadata", False, None),
+]
 
 TRANSACTION_LIST_PARAMETER_GUIDE = [
     ('from', 'start_date', False, None),
