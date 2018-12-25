@@ -27,6 +27,8 @@ CARD_CHARGE_PARAMETER_GUIDE = [
     ("billingcountry", "billing_country", False, None),
 ]
 
+BANK_CHARGE_PARAMETER_GUIDE = []
+
 TRANSACTION_LIST_PARAMETER_GUIDE = [
     ('from', 'start_date', False, None),
     ('to', "end_date", False, None),

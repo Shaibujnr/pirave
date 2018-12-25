@@ -1,11 +1,11 @@
-from pirave.charge import CardCharge
+from pirave.transaction import Transaction
 from pirave.response import Response
 from pirave.util import get_time_ms
-from pirave.enums import SUGGESTED_AUTH, RESPONSE_STATUS
+from pirave.enums import SUGGESTED_AUTH, RESPONSE_STATUS, CHARGE
 
 
 def test_card_declined(api):
-    response = CardCharge.initiate({
+    transaction = Transaction.charge(CHARGE.CARD).initiate({
         "cardno": "5143010522339965",
         "cvv": " 276",
         "expiry_month": "08",
@@ -25,10 +25,4 @@ def test_card_declined(api):
         "billing_state": "NJ",
         "billing_country": "US",
     })
-    print("\n\n\n")
-    print("From test card payment")
-    print(response.status)
-    print(response.message)
-    print(response.data)
-    print("\n\n\n")
-    assert response.status == RESPONSE_STATUS.ERROR
+    assert transaction is None

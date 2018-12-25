@@ -1,8 +1,8 @@
 import pytest
 from pirave.response import Response
-from pirave.enums import RESPONSE_STATUS, TRANSACTION_STATUS
+from pirave.enums import RESPONSE_STATUS, TRANSACTION_STATUS, CHARGE, SUGGESTED_AUTH
 from pirave.transaction import Transaction
-from pirave.exceptions import TrasactionNotFoundError
+from pirave.exceptions import TrasactionNotFoundError, InvalidChargeTypeError
 
 
 def test_verify_transaction_with_txref(api):
@@ -46,3 +46,52 @@ def test_get_transaction_with_flwref(api):
     assert transaction.rave_fee == 162.5
     assert transaction.txref == "1545676648027"
     assert transaction.id == 369835
+
+
+def test_transaction_charge_with_invalid_type():
+    with pytest.raises(InvalidChargeTypeError):
+        Transaction.charge("invalid")   
+
+
+def test_transaction_charge_type():
+    Transaction.charge(CHARGE.CARD)
+    Transaction.charge(CHARGE.BANK)
+    Transaction.charge("card")
+    Transaction.charge("bank")
+
+
+def test_transaction_charge_has_initiate():
+    charge = Transaction.charge(CHARGE.CARD)
+    assert hasattr(charge, 'initiate')
+    assert callable(charge.initiate)
+
+def test_initiate_transaction_card_charge(api):
+    data = {
+        "cardno": "5438898014560229",
+        "cvv": "789",
+        "expiry_month": "09",
+        "expiry_year": "19",
+        "pin": "3310",
+        "amount": "4500",
+        "email": "jbravo@gmail.com",
+        "suggested_auth": SUGGESTED_AUTH.PIN.value,
+        "phone_number": "08012345678",
+        "first_name": "Johnny",
+        "last_name": "Bravo",
+        "txref": "titccwpa005",
+        "metadata": [
+            {"metaname": "from", "metavalue":"titcc"}
+        ]
+    }
+    response = Transaction.charge(CHARGE.CARD).initiate(**data)
+    assert isinstance(response, Transaction)
+    assert response.txref == "titccwpa005"
+    
+
+def test_validate_transaction_card_charge(api):
+    flwref = "FLW-MOCK-95b6e9e5d191968c19b67d2aef3cbc60"
+    transaction = Transaction()
+    transaction.flwref = flwref
+    response = transaction.validate("12345")
+    assert isinstance(response, Response)
+

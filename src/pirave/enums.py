@@ -20,3 +20,8 @@ class TRANSACTION_STATUS(enum.Enum):
     SUCCESS = "successful"
     FAILED = "failed"
     PENDING = "success-pending-validation"
+
+
+class CHARGE(enum.Enum):
+    CARD = "card"
+    BANK = "bank"
