@@ -5,7 +5,7 @@ from .response import Response
 from .enums import TRANSACTION_STATUS, RESPONSE_STATUS, CHARGE, SUGGESTED_AUTH
 from .parameters import *
 from .util import validate_params, encrypt_data
-from .exceptions import TrasactionNotFoundError, InvalidChargeTypeError
+from .exceptions import TrasactionNotFoundError, InvalidChargeTypeError, RaveError
 
 
 class Transaction:
@@ -35,14 +35,19 @@ class Transaction:
     def validate(self, otp, api=None):
         api = api or default_api()
         root = api.root_url
-        url = root+"/flwv3-pug/getpaidx/api/validatecharge"
+        card_url = root+"/flwv3-pug/getpaidx/api/validatecharge"
+        account_url = root+"/flwv3-pug/getpaidx/api/validate"
+        card_key = "transaction_reference"
+        acct_key = "transactionreference"
+        url = account_url if self.payment_type == "account" else card_url
+        txref_key = acct_key if self.payment_type == "account" else card_key
         headers = {
             'content-type': 'application/json',
             'accept': 'application/json'
         }
         post_data = {
             "PBFPubKey":api.public_key,
-            "transaction_reference": self.flwref,
+            txref_key: self.flwref,
             "otp":otp
         }
         response = requests.post(url, data=json.dumps(post_data), headers=headers)
@@ -125,8 +130,8 @@ class Transaction:
         __charge_type_guide_mapping = {
             CHARGE.CARD: CARD_CHARGE_PARAMETER_GUIDE,
             CHARGE.CARD.value: CARD_CHARGE_PARAMETER_GUIDE,
-            CHARGE.BANK: BANK_CHARGE_PARAMETER_GUIDE,
-            CHARGE.BANK.value: BANK_CHARGE_PARAMETER_GUIDE
+            CHARGE.ACCOUNT: ACCOUNT_CHARGE_PARAMETER_GUIDE,
+            CHARGE.ACCOUNT.value: ACCOUNT_CHARGE_PARAMETER_GUIDE
         }
 
         try:
@@ -138,7 +143,7 @@ class Transaction:
             api = api or default_api()
             data = validate_params(data or kwargs, guide)
             data["PBFPubKey"] = api.public_key
-            if charge_type == CHARGE.BANK:
+            if charge_type == CHARGE.ACCOUNT:
                 data["payment_type"] = "account"
             root = api.root_url
             url = root+"/flwv3-pug/getpaidx/api/charge"
@@ -161,10 +166,16 @@ class Transaction:
             print(response.data)
             print("\n\n\n")
             if response.status == RESPONSE_STATUS.SUCCESS:
-                if cls.__is_auth(data, charge_type):
-                    return cls.__from_dict(response.data)
-                else:
+                if "suggested_auth" in response.data:
                     return SUGGESTED_AUTH(response.data.get("suggested_auth"))
+                else:
+                    return cls.__from_dict(response.data)
+            else:
+                if 'tx' in response.data:
+                    return cls.__from_dict(response.data.get('tx'))
+                else:
+                    raise RaveError(response.message)
+                    
         return type("__Charge", (), {'initiate':__initiate})
 
 
@@ -194,22 +205,4 @@ class Transaction:
         return transaction
 
     
-    @staticmethod
-    def __is_auth(data, charge_type):
-        if charge_type == CHARGE.CARD:
-            if not "suggested_auth" in data:
-                return False
-            sauth = SUGGESTED_AUTH(data["suggested_auth"])
-            try:
-                if sauth == SUGGESTED_AUTH.PIN:
-                    assert "pin" in data
-                elif sauth == SUGGESTED_AUTH.NOAUTH_INTERNATIONAL or sauth == SUGGESTED_AUTH.AVS_VBVSECURECODE:
-                    assert "billing_zip" in data
-                    assert "billing_city" in data
-                    assert "billing_address" in data
-                    assert "billing_state" in data
-                    assert "billing_country" in data
-            except AssertionError:
-                return False
-
-        return True 
+    

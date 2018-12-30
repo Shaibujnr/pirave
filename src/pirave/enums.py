@@ -24,4 +24,4 @@ class TRANSACTION_STATUS(enum.Enum):
 
 class CHARGE(enum.Enum):
     CARD = "card"
-    BANK = "bank"
+    ACCOUNT = "account"

@@ -1,18 +1,21 @@
-class MissingConfigException(Exception):
+class RaveError(Exception):
+    pass
+    
+class MissingConfigException(RaveError):
     pass
 
 
-class MissingArgumentException(Exception):
+class MissingArgumentException(RaveError):
     pass
 
 
-class InvalidArgumentException(Exception):
+class InvalidArgumentException(RaveError):
     pass
 
 
-class TrasactionNotFoundError(Exception):
+class TrasactionNotFoundError(RaveError):
     pass
 
 
-class InvalidChargeTypeError(KeyError):
+class InvalidChargeTypeError(RaveError):
     pass

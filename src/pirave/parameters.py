@@ -27,7 +27,7 @@ CARD_CHARGE_PARAMETER_GUIDE = [
     ("billingcountry", "billing_country", False, None),
 ]
 
-BANK_CHARGE_PARAMETER_GUIDE = [
+ACCOUNT_CHARGE_PARAMETER_GUIDE = [
     ("accountnumber", "account_number", True, None),
     ("accountbank", "bank", True, None),
     ("currency", "currency", False, "NGN"),
