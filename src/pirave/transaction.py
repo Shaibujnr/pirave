@@ -52,11 +52,6 @@ class Transaction:
         }
         response = requests.post(url, data=json.dumps(post_data), headers=headers)
         response =  Response.from_dict(response.json())
-        print("\n\n\n")
-        print(response.status)
-        print(response.message)
-        print(response.data)
-        print("\n\n\n")
         return response
     
 
@@ -159,12 +154,6 @@ class Transaction:
             }
             response = requests.post(url, data=json.dumps(post_data), headers=headers)
             response = Response.from_dict(response.json())
-            print("\n\n\n")
-            print("From initiate transaction charge")
-            print(response.status)
-            print(response.message)
-            print(response.data)
-            print("\n\n\n")
             if response.status == RESPONSE_STATUS.SUCCESS:
                 if "suggested_auth" in response.data:
                     return SUGGESTED_AUTH(response.data.get("suggested_auth"))

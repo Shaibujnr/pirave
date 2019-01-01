@@ -25,3 +25,7 @@ class TRANSACTION_STATUS(enum.Enum):
 class CHARGE(enum.Enum):
     CARD = "card"
     ACCOUNT = "account"
+
+
+class PAYMENT_PLAN_STATUS(enum.Enum):
+    ACTIVE = "active"
