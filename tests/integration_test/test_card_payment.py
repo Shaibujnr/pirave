@@ -276,33 +276,3 @@ def test_pay_with_visa_card_international(api):
     assert transaction is not None
     print(transaction.auth_url)
     assert transaction.status == TRANSACTION_STATUS.PENDING
-    
-    
-# def test_pay_with_american_express_card(api):
-#     data = {
-#         "cardno": "344173993556638",
-#         "cvv": "828",
-#         "expiry_month": "01",
-#         "expiry_year": "22",
-#         "amount": 23456.50,
-#         "email": "test_pay_with_american_express_card@gmail.com",
-#         "phone_number": "08012345678",
-#         "first_name": "John",
-#         "last_name": "Doe",
-#         "txref": "tpwaec-%s"%get_time_ms(),
-#         "metadata": [
-#             {"metaname": "from", "metavalue":"tpwaec"}
-#         ]
-#     }
-#     suggested_auth = Transaction.charge(CHARGE.CARD).initiate(**data)
-#     assert suggested_auth == SUGGESTED_AUTH.NOAUTH_INTERNATIONAL
-#     data["billing_zip"] = "07205"
-#     data["billing_city"] = "Hillside"
-#     data["billing_address"] = "470 Mundet PI"
-#     data["billing_state"] = "NJ"
-#     data["billing_country"] = "US"
-#     data["suggested_auth"] = SUGGESTED_AUTH.NOAUTH_INTERNATIONAL.value
-#     transaction = Transaction.charge(CHARGE.CARD).initiate(**data)
-#     assert transaction is not None
-#     print(transaction.auth_url)
-#     assert transaction.status == TRANSACTION_STATUS.PENDING

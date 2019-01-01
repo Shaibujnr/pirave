@@ -25,6 +25,7 @@ CARD_CHARGE_PARAMETER_GUIDE = [
     ("billingaddress", "billing_address", False, None),
     ("billingstate", "billing_state", False, None),
     ("billingcountry", "billing_country", False, None),
+    ("payment_plan", "payment_plan", False, None),
 ]
 
 ACCOUNT_CHARGE_PARAMETER_GUIDE = [

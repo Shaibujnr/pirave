@@ -89,4 +89,3 @@ def test_update_payment_plan_status(api):
     assert plan.status == PAYMENT_PLAN_STATUS.CANCELLED
     plan.update(None, "active")
     assert plan.status == PAYMENT_PLAN_STATUS.ACTIVE
-    
