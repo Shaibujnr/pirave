@@ -70,3 +70,23 @@ def test_cancel_payment_plan_without_id(api):
     plan = PaymentPlan()
     with pytest.raises(RaveError):
         plan.cancel()
+
+
+def test_update_payment_plan_name(api):
+    name = "test update payment plan"
+    plan = PaymentPlan()
+    plan.id = 1327
+    assert plan.name != name
+    plan.update(name, None)
+    assert plan.token is not None
+    assert plan.name == name
+
+
+def test_update_payment_plan_status(api):
+    plan = PaymentPlan()
+    plan.id = 1307
+    plan.cancel()
+    assert plan.status == PAYMENT_PLAN_STATUS.CANCELLED
+    plan.update(None, "active")
+    assert plan.status == PAYMENT_PLAN_STATUS.ACTIVE
+    

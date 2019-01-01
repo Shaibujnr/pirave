@@ -52,6 +52,40 @@ class PaymentPlan:
             raise RaveError(res.message)
 
 
+    def update(self, name, status, api=None):
+        api = api or default_api()
+        path = "/v2/gpx/paymentplans/%s/edit"%str(self.id)
+        url = api.root_url+path
+        status = status.value if isinstance(status, PAYMENT_PLAN_STATUS) else status
+        post_data = {"seckey":api.private_key, "name":name, "status":status}
+        headers = {
+            'content-type': 'application/json',
+            'accept': 'application/json'
+        }
+        response = requests.post(url, data=json.dumps(post_data), headers=headers)
+        res = Response.from_dict(response.json())
+        # TODO: remove debug print statements
+        print("\n\n\n")
+        print("from update payment plan")
+        print(res.status)
+        print(res.message)
+        print(res.data)
+        print("\n\n\n")
+        if res.status  == RESPONSE_STATUS.SUCCESS:
+            data = res.data
+            self.id = data['id']
+            self.name = data['name']
+            self.amount = float(data['amount'])
+            self.interval = data['interval']
+            self.duration = int(data['duration'])
+            self.status = PAYMENT_PLAN_STATUS(data['status'])
+            self.currency = data['currency']
+            self.token = data['uuid']
+            self.date_created = data['createdAt']
+        else:
+            raise RaveError(res.message)
+
+
     @classmethod
     def create(cls, name, interval, amount=None, duration=None, api=None):
         api = api or default_api()
