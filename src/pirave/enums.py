@@ -29,3 +29,4 @@ class CHARGE(enum.Enum):
 
 class PAYMENT_PLAN_STATUS(enum.Enum):
     ACTIVE = "active"
+    CANCELLED = "cancelled"

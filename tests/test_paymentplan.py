@@ -1,6 +1,8 @@
+import pytest
 from pirave.payment_plan import PaymentPlan
 from pirave.response import Response
-from pirave.enums import RESPONSE_STATUS
+from pirave.enums import RESPONSE_STATUS, PAYMENT_PLAN_STATUS
+from pirave.exceptions import RaveError
 
 
 def test_create_payment_plan_with_no_amount_and_duration(api):
@@ -54,3 +56,17 @@ def test_get_payment_plan_with_name(api):
     plan = PaymentPlan.get(None, "tcppwnd")
     assert isinstance(plan, PaymentPlan)
     assert plan.name == "tcppwnd"
+
+
+def test_cancel_payment_plan(api):
+    plan = PaymentPlan()
+    plan.id = 1299
+    plan.cancel()
+    assert plan.token is not None
+    assert plan.status == PAYMENT_PLAN_STATUS.CANCELLED
+
+
+def test_cancel_payment_plan_without_id(api):
+    plan = PaymentPlan()
+    with pytest.raises(RaveError):
+        plan.cancel()
