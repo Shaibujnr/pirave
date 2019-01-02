@@ -1,9 +1,11 @@
-from pirave.enums import (CHARGE, RESPONSE_STATUS, SUGGESTED_AUTH,
-                          TRANSACTION_STATUS, PAYMENT_PLAN_STATUS)
+import pytest
+from pirave.enums import *
 from pirave.response import Response
 from pirave.transaction import Transaction
 from pirave.payment_plan import PaymentPlan
 from pirave.util import get_time_ms
+from pirave.subscription import Subscription
+from pirave.exceptions import RaveError
 
 
 def test_card_subscription_with_plan_of_no_amount(api):
@@ -179,3 +181,29 @@ def test_card_sbscription_to_plan_with_duration(api):
     assert response.status == RESPONSE_STATUS.SUCCESS
     status = Transaction.verify(transaction.txref)
     assert status == TRANSACTION_STATUS.SUCCESS
+
+
+def test_list_subscriptions(api):
+    subs = Subscription.list()
+    assert isinstance(subs, list)
+    assert len(subs) > 0
+    assert isinstance(subs[0], Subscription)
+
+
+def test_get_subscription_with_id(api):
+    sub = Subscription.get(1571)
+    assert isinstance(sub, Subscription)
+    assert sub.id == 1571
+    assert isinstance(sub.status, SUBSCRIPTION_STATUS)
+
+
+def test_get_subscription_with_email(api):
+    sub = Subscription.get(None, "test_card_sbscription_with_different_amount@gmail.com")
+    assert isinstance(sub, Subscription)
+    assert sub.customer_email == "test_card_sbscription_with_different_amount@gmail.com"
+    assert isinstance(sub.status, SUBSCRIPTION_STATUS)
+
+
+def test_get_subscription_with_email_and_id(api):
+    with pytest.raises(RaveError):
+        sub = Subscription.get(1571, "test_card_sbscription_with_different_amount@gmail.com")
