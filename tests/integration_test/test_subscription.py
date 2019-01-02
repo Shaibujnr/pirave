@@ -206,4 +206,11 @@ def test_get_subscription_with_email(api):
 
 def test_get_subscription_with_email_and_id(api):
     with pytest.raises(RaveError):
-        sub = Subscription.get(1571, "test_card_sbscription_with_different_amount@gmail.com")
+        Subscription.get(1571, "test_card_sbscription_with_different_amount@gmail.com")
+
+
+def test_cancel_subscription(api):
+    sub = Subscription()
+    sub.id = 1571
+    sub.cancel()
+    assert sub.status == SUBSCRIPTION_STATUS.CANCELLED

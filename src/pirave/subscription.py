@@ -93,3 +93,35 @@ class Subscription:
                 raise RaveError(msg.format(id,customer_email))
         else:
             raise RaveError(response.message)
+
+
+    def cancel(self, api=None):
+        api = api or default_api()
+        root = api.root_url
+        path = "/v2/gpx/subscriptions/{0}/cancel".format(self.id)
+        url = root + path
+        post_data = {'seckey': api.private_key}
+        headers = {
+                'content-type': 'application/json',
+                'accept': 'application/json'
+        }
+        response = requests.post(url, data=json.dumps(post_data), headers=headers)
+        response = Response.from_dict(response.json())
+        # TODO: remove debug print statements
+        print("\n\n\n")
+        print("from cancel subscription")
+        print(response.status)
+        print(response.message)
+        print(response.data)
+        print("\n\n\n")
+        if response.status == RESPONSE_STATUS.SUCCESS:
+            data = response.data
+            self.id = data['id']
+            self.amount = data['amount']
+            self.customer_id = data['customer']['id']
+            self.customer_email = data['customer']['customer_email']
+            self.plan_id = data['plan']
+            self.status = SUBSCRIPTION_STATUS(data['status'])
+            self.date_created = data['date_created']
+        else:
+            raise RaveError(response.message)
