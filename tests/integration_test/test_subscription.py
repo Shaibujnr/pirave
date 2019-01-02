@@ -214,3 +214,12 @@ def test_cancel_subscription(api):
     sub.id = 1571
     sub.cancel()
     assert sub.status == SUBSCRIPTION_STATUS.CANCELLED
+
+
+def test_activate_subscription(api):
+    sub = Subscription()
+    sub.id = 1571
+    sub.cancel()
+    assert sub.status == SUBSCRIPTION_STATUS.CANCELLED
+    sub.activate()
+    assert sub.status == SUBSCRIPTION_STATUS.ACTIVE
